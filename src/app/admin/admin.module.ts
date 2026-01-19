@@ -33,6 +33,7 @@ import { OfficersComponent, OfficerDialogComponent } from './officers/officers.c
 import { PostingsComponent, PostingDialogComponent } from './postings/postings.component';
 import { CaseTypesComponent, CaseTypeDialogComponent } from './case-types/case-types.component';
 import { FormSchemaBuilderComponent, FormFieldDialogComponent } from './form-schema-builder/form-schema-builder.component';
+import { SystemSettingsComponent } from './system-settings/system-settings.component';
 
 /**
  * Routes for Admin Module
@@ -81,8 +82,12 @@ const routes: Routes = [
   {
     path: 'form-schema-builder/:caseTypeId',
     component: FormSchemaBuilderComponent,
-    canActivate: [AdminGuard],
-    data: { breadcrumb: `Form Schema Builder` }
+    canActivate: [AdminGuard]
+  },
+  {
+    path: 'system-settings',
+    component: SystemSettingsComponent,
+    canActivate: [AdminGuard]
   }
 ];
 
@@ -103,7 +108,8 @@ const routes: Routes = [
     CaseTypesComponent,
     CaseTypeDialogComponent,
     FormSchemaBuilderComponent,
-    FormFieldDialogComponent
+    FormFieldDialogComponent,
+    SystemSettingsComponent
   ],
   imports: [
     CommonModule,

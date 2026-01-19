@@ -1,36 +1,48 @@
 <footer class="app-footer">
-  <div class="footer-top">
-    <div class="footer-links">
-      <a href="#">Feedback</a>
-      <span>|</span>
-      <a href="#">Website Policies</a>
-      <span>|</span>
-      <a href="#">Contact Us</a>
-      <span>|</span>
-      <a href="#">Web Information Manager</a>
-    </div>
-  </div>
+  <div class="footer-container">
+    <ng-container *ngIf="settings$ | async as settings; else defaultFooter">
+      <!-- Footer Text -->
+      <div class="footer-text" *ngIf="settings.footerText">
+        <p>{{ settings.footerText }}</p>
+      </div>
 
-  <div class="footer-middle">
-    <p>
-      Content Owned by <strong>Department of Land Resources</strong>,
-      Ministry of Rural Development
-    </p>
-    <p>
-      Developed and hosted by
-      <a href="https://www.nic.in/" target="_blank">National Informatics Centre</a>,
-      <br />
-      Ministry of Electronics & Information Technology, Government of India
-    </p>
-    <p class="last-updated">
-      Last Updated: <strong>{{ lastUpdated | date: 'MMMM dd, yyyy' }}</strong>
-    </p>
-  </div>
+      <!-- Footer Info -->
+      <div class="footer-info" *ngIf="settings.footerAddress || settings.footerEmail || settings.footerPhone || settings.footerWebsite">
+        <!-- Address -->
+        <div class="footer-item" *ngIf="settings.footerAddress">
+          <mat-icon class="footer-icon">location_on</mat-icon>
+          <span>{{ settings.footerAddress }}</span>
+        </div>
 
-  <div class="footer-bottom">
-    <div class="footer-logos">
-      <img src="../../../../assets/nic-logo.png" alt="NIC" />
-      <img src="../../../../assets/digital-india.png" alt="Digital India" />
-    </div>
+        <!-- Email -->
+        <div class="footer-item" *ngIf="settings.footerEmail">
+          <mat-icon class="footer-icon">email</mat-icon>
+          <a [href]="'mailto:' + settings.footerEmail">{{ settings.footerEmail }}</a>
+        </div>
+
+        <!-- Phone -->
+        <div class="footer-item" *ngIf="settings.footerPhone">
+          <mat-icon class="footer-icon">phone</mat-icon>
+          <a [href]="'tel:' + settings.footerPhone">{{ settings.footerPhone }}</a>
+        </div>
+
+        <!-- Website -->
+        <div class="footer-item" *ngIf="settings.footerWebsite">
+          <mat-icon class="footer-icon">language</mat-icon>
+          <a [href]="settings.footerWebsite" target="_blank" rel="noopener noreferrer">Visit Website</a>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <div class="footer-copyright" *ngIf="settings.footerCopyright">
+        <p>{{ settings.footerCopyright }}</p>
+      </div>
+    </ng-container>
+    <ng-template #defaultFooter>
+      <!-- Default Footer (shown while loading or if API fails) -->
+      <div class="footer-text">
+        <p>NIC | Government of Manipur</p>
+      </div>
+    </ng-template>
   </div>
 </footer>
