@@ -20,10 +20,10 @@ import { AdminService } from '../../admin/admin.service';
 export class LoginComponent {
   selectedTab = 0; // 0 = Citizen, 1 = Operator
   loginMethod = 'mobile'; // 'mobile' or 'password'
-  
+
   mobileLoginForm: FormGroup;
   passwordLoginForm: FormGroup;
-  
+
   captchaText = '';
   passwordCaptchaText = '';
   captchaId = ''; // Store CAPTCHA ID for verification
@@ -156,13 +156,13 @@ export class LoginComponent {
     if (mobilePattern.test(value)) {
       return null;
     }
-    
+
     // Check if it's a valid email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (emailPattern.test(value)) {
       return null;
     }
-    
+
     // If neither mobile nor email, return error
     return { invalid: true };
   }
@@ -185,7 +185,7 @@ export class LoginComponent {
           // Handle new API response structure { success, message, data }
           const apiResponse = response?.success !== undefined ? response : { success: true, data: response };
           const captchaData = apiResponse.success ? apiResponse.data : response;
-          
+
           if (captchaData?.captchaId && captchaData?.captchaText) {
             this.captchaId = captchaData.captchaId;
             this.captchaText = captchaData.captchaText;
@@ -222,7 +222,7 @@ export class LoginComponent {
           // Handle new API response structure { success, message, data }
           const apiResponse = response?.success !== undefined ? response : { success: true, data: response };
           const captchaData = apiResponse.success ? apiResponse.data : response;
-          
+
           if (captchaData?.captchaId && captchaData?.captchaText) {
             this.passwordCaptchaId = captchaData.captchaId;
             this.passwordCaptchaText = captchaData.captchaText;
@@ -249,14 +249,14 @@ export class LoginComponent {
     for (let i = 0; i < 6; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    
+
     // Generate UUID for CAPTCHA ID
     const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0;
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
-    
+
     if (isMobile) {
       this.captchaText = result;
       this.captchaId = uuid;
@@ -279,11 +279,11 @@ export class LoginComponent {
     if (this.mobileLoginForm.get('mobile')?.valid) {
       const mobileNumber = this.mobileLoginForm.get('mobile')?.value;
       const citizenType = this.selectedTab === 0 ? 'CITIZEN' : 'OPERATOR';
-      
+
       this.isSendingOtp = true;
       this.otpErrorMessage = '';
       this.otpSuccessMessage = '';
-      
+
       this.apiService.sendOTP(mobileNumber, citizenType)
         .pipe(
           catchError(error => {
@@ -312,33 +312,33 @@ export class LoginComponent {
    */
   private handleOtpSuccess(response: any, mobileNumber: string): void {
     console.log('OTP sent successfully:', response);
-    
+
     // Handle new API response structure { success, message, data }
     const apiResponse = response?.success ? response : { success: true, data: response };
-    
+
     if (apiResponse.success) {
       this.otpSent = true;
       const otpCode = apiResponse.data?.otpCode;
       const message = apiResponse.message || `OTP has been sent to your mobile number: ${mobileNumber}`;
-      
+
       // Store OTP code for development display
       this.otpCode = otpCode || null;
-      
+
       // Show OTP code in console for testing (as per API documentation)
       if (otpCode) {
         console.log('OTP Code (for testing):', otpCode);
       }
-      
+
       this.otpSuccessMessage = message;
-      
+
       // Enable OTP field validation
       this.mobileLoginForm.get('otp')?.setValidators([Validators.required, Validators.pattern(/^\d{6}$/)]);
       this.mobileLoginForm.get('otp')?.updateValueAndValidity();
-      
+
       // Clear OTP and CAPTCHA fields
       this.mobileLoginForm.patchValue({ otp: '', captcha: '' });
       this.refreshCaptcha();
-      
+
       // Clear success message after 5 seconds
       setTimeout(() => {
         this.otpSuccessMessage = '';
@@ -351,7 +351,7 @@ export class LoginComponent {
    */
   private handleOtpError(error: any): void {
     console.error('Send OTP error:', error);
-    
+
     if (error.error) {
       if (error.error.message) {
         this.otpErrorMessage = error.error.message;
@@ -371,7 +371,7 @@ export class LoginComponent {
     } else {
       this.otpErrorMessage = 'Failed to send OTP. Please try again later.';
     }
-    
+
     // Clear error message after 5 seconds
     setTimeout(() => {
       this.otpErrorMessage = '';
@@ -433,8 +433,8 @@ export class LoginComponent {
   private validateCaptchaAndLogin(
     identifier: string, // mobileNumber for mobile login, username for password login
     credential: string, // otp for mobile login, password for password login
-    captcha: string, 
-    captchaId: string, 
+    captcha: string,
+    captchaId: string,
     citizenType: string,
     isMobileLogin: boolean
   ): void {
@@ -454,7 +454,7 @@ export class LoginComponent {
           // Handle new API response structure { success, message, data }
           const apiResponse = response?.success !== undefined ? response : { success: true, data: response };
           const isValid = apiResponse.data?.valid !== false && apiResponse.valid !== false;
-          
+
           if (isValid === false || (apiResponse.data?.valid === false) || (apiResponse.valid === false)) {
             if (isMobileLogin) {
               this.isLoggingIn = false;
@@ -491,8 +491,8 @@ export class LoginComponent {
   private proceedWithLogin(
     identifier: string, // mobileNumber for mobile login, username for password login
     credential: string, // otp for mobile login, password for password login
-    captcha: string, 
-    captchaId: string, 
+    captcha: string,
+    captchaId: string,
     citizenType: string,
     isMobileLogin: boolean
   ): void {
@@ -544,11 +544,11 @@ export class LoginComponent {
    */
   private handleLoginSuccess(response: any): void {
     console.log('Login successful:', response);
-    
+
     // Handle new API response structure { success, message, data }
     const apiResponse = response?.success !== undefined ? response : { success: true, data: response };
     const responseData = apiResponse.success ? apiResponse.data : response;
-    
+
     // Extract token and user data from response
     const token = responseData?.token;
     const refreshToken = responseData?.refreshToken;
@@ -568,9 +568,9 @@ export class LoginComponent {
     if (token) {
       // Store authentication data
       this.authService.setAuthData(token, refreshToken || '', userData);
-      
+      this.authService.sendData(true);
       this.loginSuccessMessage = apiResponse.message || 'Login successful! Redirecting...';
-      
+
       // Redirect based on user type
       setTimeout(() => {
         if (citizenType === 'CITIZEN' || this.selectedTab === 0) {
@@ -593,7 +593,7 @@ export class LoginComponent {
    */
   private handleLoginError(error: any): void {
     console.error('Login error:', error);
-    
+
     if (error.error) {
       if (error.error.message) {
         this.loginErrorMessage = error.error.message;
@@ -616,7 +616,7 @@ export class LoginComponent {
     } else {
       this.loginErrorMessage = 'An error occurred during login. Please try again later.';
     }
-    
+
     // Clear error message after 5 seconds
     setTimeout(() => {
       this.loginErrorMessage = '';
@@ -700,11 +700,11 @@ export class LoginComponent {
    */
   private handlePasswordLoginSuccess(response: any): void {
     console.log('Password login successful:', response);
-    
+
     // Handle new API response structure { success, message, data }
     const apiResponse = response?.success !== undefined ? response : { success: true, data: response };
     const responseData = apiResponse.success ? apiResponse.data : response;
-    
+
     // Extract token and user data from response (same as mobile login)
     const token = responseData?.token;
     const refreshToken = responseData?.refreshToken;
@@ -724,9 +724,9 @@ export class LoginComponent {
     if (token) {
       // Store authentication data
       this.authService.setAuthData(token, refreshToken || '', userData);
-      
+      this.authService.sendData(true);
       this.passwordLoginSuccessMessage = apiResponse.message || 'Login successful! Redirecting...';
-      
+
       // Redirect based on user type
       setTimeout(() => {
         if (citizenType === 'CITIZEN' || this.selectedTab === 0) {
@@ -831,7 +831,7 @@ export class LoginComponent {
    */
   private handlePasswordLoginError(error: any): void {
     console.error('Password login error:', error);
-    
+
     if (error.error) {
       if (error.error.message) {
         this.passwordLoginErrorMessage = error.error.message;
@@ -856,7 +856,7 @@ export class LoginComponent {
     } else {
       this.passwordLoginErrorMessage = 'An error occurred during login. Please try again later.';
     }
-    
+
     // Clear error message after 5 seconds
     setTimeout(() => {
       this.passwordLoginErrorMessage = '';

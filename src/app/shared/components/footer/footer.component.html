@@ -1,6 +1,36 @@
 <footer class="app-footer">
-  <div class="footer-content">
-    <p class="footer-text">{{ footerText }}</p>
+  <div class="footer-top">
+    <div class="footer-links">
+      <a href="#">Feedback</a>
+      <span>|</span>
+      <a href="#">Website Policies</a>
+      <span>|</span>
+      <a href="#">Contact Us</a>
+      <span>|</span>
+      <a href="#">Web Information Manager</a>
+    </div>
+  </div>
+
+  <div class="footer-middle">
+    <p>
+      Content Owned by <strong>Department of Land Resources</strong>,
+      Ministry of Rural Development
+    </p>
+    <p>
+      Developed and hosted by
+      <a href="https://www.nic.in/" target="_blank">National Informatics Centre</a>,
+      <br />
+      Ministry of Electronics & Information Technology, Government of India
+    </p>
+    <p class="last-updated">
+      Last Updated: <strong>{{ lastUpdated | date: 'MMMM dd, yyyy' }}</strong>
+    </p>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-logos">
+      <img src="../../../../assets/nic-logo.png" alt="NIC" />
+      <img src="../../../../assets/digital-india.png" alt="Digital India" />
+    </div>
   </div>
 </footer>
-

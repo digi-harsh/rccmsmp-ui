@@ -11,5 +11,6 @@ import { Component } from '@angular/core';
 })
 export class FooterComponent {
   footerText = 'NIC | Government of Manipur';
+  lastUpdated = new Date();
 }
 

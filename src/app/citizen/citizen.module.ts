@@ -21,7 +21,8 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    component: CitizenHomeComponent
+    component: CitizenHomeComponent,
+    data: { breadcrumb: 'Home' }
   }
 ];
 

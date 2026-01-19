@@ -21,6 +21,9 @@ export class AuthService {
   private refreshTokenInProgress: boolean = false;
   private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 
+  private dataSource = new BehaviorSubject<any>(null);
+  data$ = this.dataSource.asObservable();
+
   constructor(
     private router: Router,
     private apiService: ApiService
@@ -28,6 +31,10 @@ export class AuthService {
     const userData = this.getUserData();
     this.currentUserSubject = new BehaviorSubject<any | null>(userData);
     this.currentUser$ = this.currentUserSubject.asObservable();
+  }
+
+  sendData(data: any) {
+    this.dataSource.next(data);
   }
 
   /**
@@ -116,7 +123,7 @@ export class AuthService {
    */
   refreshAccessToken(): Observable<string> {
     const refreshToken = this.getRefreshToken();
-    
+
     if (!refreshToken) {
       this.logout();
       return throwError(() => new Error('No refresh token available'));
@@ -139,7 +146,7 @@ export class AuthService {
         // Handle new API response structure { success, message, data }
         const apiResponse = response?.success !== undefined ? response : { success: true, data: response };
         const responseData = apiResponse.success ? apiResponse.data : response;
-        
+
         const newToken = responseData?.token;
         const newRefreshToken = responseData?.refreshToken || refreshToken;
         const expiresIn = responseData?.expiresIn;
@@ -147,12 +154,12 @@ export class AuthService {
         if (newToken) {
           // Update stored token
           localStorage.setItem(this.TOKEN_KEY, newToken);
-          
+
           // Update refresh token if a new one is provided
           if (newRefreshToken && newRefreshToken !== refreshToken) {
             localStorage.setItem(this.REFRESH_TOKEN_KEY, newRefreshToken);
           }
-          
+
           // Update user data if provided
           if (responseData?.userId || responseData?.citizenType) {
             const currentUserData = this.getUserData() || {};
@@ -180,12 +187,12 @@ export class AuthService {
       catchError((error) => {
         this.refreshTokenInProgress = false;
         this.refreshTokenSubject.next(null);
-        
+
         // If refresh token is invalid/expired, logout user
         if (error.status === 401 || error.status === 403) {
           this.logout();
         }
-        
+
         return throwError(() => error);
       })
     );
@@ -196,7 +203,7 @@ export class AuthService {
    */
   getValidToken(): Observable<string> {
     const token = this.getToken();
-    
+
     if (!token) {
       return throwError(() => new Error('No token available'));
     }
