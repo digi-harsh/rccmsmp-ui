@@ -96,11 +96,11 @@ export class AdminLoginComponent {
       // Store admin user data
       const adminData = {
         userId: responseData?.userId,
-        email: responseData?.email,
+        email: responseData?.email || 'admin@gmail.com',
         mobileNumber: responseData?.mobileNumber
       };
+      this.authService.sendData(adminData);
       localStorage.setItem('adminUserData', JSON.stringify(adminData));
-      this.authService.sendData(true);
       this.successMessage = apiResponse.message || 'Login successful! Redirecting...';
 
       // Redirect to admin dashboard

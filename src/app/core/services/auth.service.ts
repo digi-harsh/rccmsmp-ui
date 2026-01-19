@@ -9,7 +9,7 @@ import { ApiService } from './api.service';
  * Handles authentication state and token management
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
@@ -19,22 +19,32 @@ export class AuthService {
   private currentUserSubject: BehaviorSubject<any | null>;
   public currentUser$: Observable<any | null>;
   private refreshTokenInProgress: boolean = false;
-  private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+  private refreshTokenSubject: BehaviorSubject<string | null> =
+    new BehaviorSubject<string | null>(null);
 
   private dataSource = new BehaviorSubject<any>(null);
-  data$ = this.dataSource.asObservable();
+  user$ = this.dataSource.asObservable();
 
   constructor(
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
   ) {
     const userData = this.getUserData();
     this.currentUserSubject = new BehaviorSubject<any | null>(userData);
     this.currentUser$ = this.currentUserSubject.asObservable();
+    const storedUser = localStorage.getItem('user_data');
+    if (storedUser) {
+      this.dataSource.next(JSON.parse(storedUser));
+    }
+
+    const storedAdmin = localStorage.getItem('adminUserData');
+    if (storedAdmin) {
+      this.dataSource.next(JSON.parse(storedAdmin));
+    }
   }
 
-  sendData(data: any) {
-    this.dataSource.next(data);
+  sendData(userData: any) {
+    this.dataSource.next(userData);
   }
 
   /**
@@ -106,6 +116,7 @@ export class AuthService {
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.router.navigate(['/home']);
+    localStorage.removeItem('user_data');
   }
 
   /**
@@ -134,7 +145,7 @@ export class AuthService {
       return this.refreshTokenSubject.asObservable().pipe(
         filter((token): token is string => token !== null),
         take(1),
-        switchMap(token => of(token))
+        switchMap((token) => of(token)),
       );
     }
 
@@ -144,7 +155,10 @@ export class AuthService {
     return this.apiService.refreshToken(refreshToken).pipe(
       switchMap((response) => {
         // Handle new API response structure { success, message, data }
-        const apiResponse = response?.success !== undefined ? response : { success: true, data: response };
+        const apiResponse =
+          response?.success !== undefined
+            ? response
+            : { success: true, data: response };
         const responseData = apiResponse.success ? apiResponse.data : response;
 
         const newToken = responseData?.token;
@@ -166,12 +180,17 @@ export class AuthService {
             const updatedUserData = {
               ...currentUserData,
               userId: responseData.userId || currentUserData.userId,
-              citizenType: responseData.citizenType || currentUserData.citizenType,
+              citizenType:
+                responseData.citizenType || currentUserData.citizenType,
               email: responseData.email || currentUserData.email,
-              mobileNumber: responseData.mobileNumber || currentUserData.mobileNumber,
-              expiresIn: expiresIn || currentUserData.expiresIn
+              mobileNumber:
+                responseData.mobileNumber || currentUserData.mobileNumber,
+              expiresIn: expiresIn || currentUserData.expiresIn,
             };
-            localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUserData));
+            localStorage.setItem(
+              this.USER_KEY,
+              JSON.stringify(updatedUserData),
+            );
             this.currentUserSubject.next(updatedUserData);
           }
 
@@ -181,7 +200,9 @@ export class AuthService {
         } else {
           this.refreshTokenInProgress = false;
           this.refreshTokenSubject.next(null);
-          return throwError(() => new Error('Invalid response from refresh token API'));
+          return throwError(
+            () => new Error('Invalid response from refresh token API'),
+          );
         }
       }),
       catchError((error) => {
@@ -194,7 +215,7 @@ export class AuthService {
         }
 
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -223,7 +244,7 @@ export class AuthService {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const expirationDate = payload.exp * 1000; // Convert to milliseconds
-      const expirationThreshold = Date.now() + (minutes * 60 * 1000); // Add minutes in milliseconds
+      const expirationThreshold = Date.now() + minutes * 60 * 1000; // Add minutes in milliseconds
       return expirationDate <= expirationThreshold;
     } catch (e) {
       return true;
@@ -237,4 +258,3 @@ export class AuthService {
     localStorage.setItem(this.TOKEN_KEY, token);
   }
 }
-

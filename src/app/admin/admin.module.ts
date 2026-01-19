@@ -82,12 +82,14 @@ const routes: Routes = [
   {
     path: 'form-schema-builder/:caseTypeId',
     component: FormSchemaBuilderComponent,
-    canActivate: [AdminGuard]
+    canActivate: [AdminGuard],
+    data: { breadcrumb: 'Form Schema Builder' }
   },
   {
     path: 'system-settings',
     component: SystemSettingsComponent,
-    canActivate: [AdminGuard]
+    canActivate: [AdminGuard],
+    data: { breadcrumb: 'System Settings' }
   }
 ];
 
